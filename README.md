@@ -1,6 +1,8 @@
 # ML2026 Household Power Forecasting
 
-这个仓库是一个机器学习课程项目的精简代码版，用于对 UCI Individual Household Electric Power Consumption 数据集进行日级用电量预测。仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含课程文档、报告或模型训练产物。
+本仓库用于对 UCI Individual Household Electric Power Consumption 数据集进行日级用电量预测。
+
+仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含模型训练产物。
 
 ## 内容
 
@@ -53,7 +55,7 @@ conda activate ml_power
 
 [UCI Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
 
-默认预处理脚本会尝试下载 Météo-France 月度气象数据并缓存到 `data/weather/`，该目录不会提交到 Git：
+默认预处理脚本会尝试下载 Météo-France 月度气象数据并缓存到 `data/weather/`：
 
 [Météo-France monthly climatological data](https://www.data.gouv.fr/fr/datasets/donnees-climatologiques-de-base-mensuelles)
 
@@ -77,13 +79,13 @@ python scripts\prepare_data.py --weather-mode none
 python scripts\run_experiments.py --preset smoke --models last_value moving_average weekly_seasonal_naive lstm transformer patch_channel_mixer --horizons 90 --seeds 0
 ```
 
-较完整的实验：
+完整的实验：
 
 ```powershell
 python scripts\run_experiments.py --preset full --models last_value moving_average weekly_seasonal_naive lstm transformer patch_channel_mixer --horizons 90 365 --seeds 0 1 2 3 4
 ```
 
-实验指标和预测结果默认写入 `results/`，训练检查点写入 `models/`，这些运行产物不会提交到 Git。
+实验指标和预测结果默认写入 `results/`，训练检查点写入 `models/`。
 
 生成结果图：
 
