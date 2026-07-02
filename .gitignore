@@ -1,0 +1,29 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local raw data and downloaded archives
+household_power_consumption.txt
+data/weather/
+*.gz
+
+# Runtime outputs
+models/
+results/
+figures/
+tmp/
+
+# Reports, documents, and generated manuscript artifacts
+docs/
+reports/
+*.pdf
+*.docx
+*.pptx
+*.tex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.xdv

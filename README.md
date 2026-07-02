@@ -1,0 +1,102 @@
+# ML2026 Household Power Forecasting
+
+这个仓库是一个机器学习课程项目的精简代码版，用于对 UCI Individual Household Electric Power Consumption 数据集进行日级用电量预测。仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含课程文档、报告或模型训练产物。
+
+## 内容
+
+```text
+src/power_forecast/   数据处理、模型、训练、实验和绘图代码
+scripts/              命令行入口
+tests/                单元测试
+data/                 已处理的小型 daily/train/test CSV
+```
+
+主要模型包括：
+
+- LSTM
+- Transformer
+- PatchChannelMixer
+- last value、moving average、weekly seasonal naive 三个简单基线
+
+## 环境
+
+推荐使用 Python 3.11。
+
+```powershell
+conda create -n ml_power python=3.11 -y
+conda activate ml_power
+pip install -r requirements.txt
+```
+
+如果需要 GPU 版 PyTorch，请根据本机 CUDA 版本从 PyTorch 官网选择安装命令。例如：
+
+```powershell
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
+```
+
+也可以用 Conda 环境文件：
+
+```powershell
+conda env create -f environment.yml
+conda activate ml_power
+```
+
+## 数据
+
+仓库内已包含处理后的：
+
+- `data/daily_power.csv`
+- `data/train.csv`
+- `data/test.csv`
+
+如果要从原始数据重新生成，请下载 UCI 原始文件 `household_power_consumption.txt` 并放到仓库根目录：
+
+[UCI Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
+
+默认预处理脚本会尝试下载 Météo-France 月度气象数据并缓存到 `data/weather/`，该目录不会提交到 Git：
+
+[Météo-France monthly climatological data](https://www.data.gouv.fr/fr/datasets/donnees-climatologiques-de-base-mensuelles)
+
+## 常用命令
+
+重新准备数据：
+
+```powershell
+python scripts\prepare_data.py
+```
+
+不使用气象特征重新准备数据：
+
+```powershell
+python scripts\prepare_data.py --weather-mode none
+```
+
+快速跑通实验：
+
+```powershell
+python scripts\run_experiments.py --preset smoke --models last_value moving_average weekly_seasonal_naive lstm transformer patch_channel_mixer --horizons 90 --seeds 0
+```
+
+较完整的实验：
+
+```powershell
+python scripts\run_experiments.py --preset full --models last_value moving_average weekly_seasonal_naive lstm transformer patch_channel_mixer --horizons 90 365 --seeds 0 1 2 3 4
+```
+
+实验指标和预测结果默认写入 `results/`，训练检查点写入 `models/`，这些运行产物不会提交到 Git。
+
+生成结果图：
+
+```powershell
+python scripts\make_plots.py
+```
+
+运行测试：
+
+```powershell
+python -m pytest -q
+```
+
+## 说明
+
+`data/test.csv` 前 90 天是为了构造第一个测试窗口而保留的历史输入，不作为测试标签参与指标计算。训练、验证和测试按时间顺序划分，标准化参数只由训练集拟合。
