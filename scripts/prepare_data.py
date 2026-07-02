@@ -16,7 +16,7 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=ROOT / "data")
     parser.add_argument("--test-days", type=int, default=365)
     parser.add_argument("--input-days", type=int, default=90)
-    parser.add_argument("--weather-mode", choices=["lagged", "current", "none"], default="lagged")
+    parser.add_argument("--weather-mode", choices=["current", "lagged", "none"], default="current")
     parser.add_argument("--weather-path", type=Path, default=None)
     parser.add_argument("--weather-dir", type=Path, default=ROOT / "data" / "weather")
     parser.add_argument("--weather-department", default="92")
@@ -42,9 +42,6 @@ def main() -> None:
         weather_path=weather_path,
         weather_lag_months=weather_lag_months,
     )
-    if args.output_dir.resolve() == (ROOT / "data").resolve():
-        train.to_csv(ROOT / "train.csv", index=False)
-        test.to_csv(ROOT / "test.csv", index=False)
     print(f"daily_power.csv: {len(daily)} rows")
     print(f"train.csv: {len(train)} rows")
     print(f"test.csv: {len(test)} rows, including {args.input_days} warm-up days")

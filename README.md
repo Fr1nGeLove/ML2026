@@ -55,9 +55,11 @@ conda activate ml_power
 
 [UCI Individual Household Electric Power Consumption](https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption)
 
-默认预处理脚本会尝试下载 Météo-France 月度气象数据并缓存到 `data/weather/`：
+默认预处理脚本会尝试下载 Météo-France 月度气候数据并缓存到 `data/weather/`：
 
 [Météo-France monthly climatological data](https://www.data.gouv.fr/fr/datasets/donnees-climatologiques-de-base-mensuelles)
+
+课程提供的是月度气候数据，不需要逐日天气数据。预处理时会把同一个月的 `RR`、`NBJRR1`、`NBJRR5`、`NBJRR10`、`NBJBROU` 映射到该月每天；其中 `RR` 按课程提示除以 10。
 
 ## 常用命令
 
@@ -71,6 +73,12 @@ python scripts\prepare_data.py
 
 ```powershell
 python scripts\prepare_data.py --weather-mode none
+```
+
+如需使用上一月气候统计以避免目标月份信息进入输入窗口，可以运行：
+
+```powershell
+python scripts\prepare_data.py --weather-mode lagged
 ```
 
 快速跑通实验：

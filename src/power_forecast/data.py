@@ -61,13 +61,10 @@ METEO_FRANCE_MONTHLY_URL_TEMPLATE = (
 
 WEATHER_FIELD_MAP = {
     "weather_rain_mm": "RR",
-    "weather_tmax": "TX",
-    "weather_tmin": "TN",
-    "weather_tmean": "TM",
-    "weather_temp_amp": "TAMPLIM",
-    "weather_rain_days": "NBJRR1",
-    "weather_frost_days": "NBJGELEE",
-    "weather_hot_days": "NBJTX25",
+    "weather_rain_days_1mm": "NBJRR1",
+    "weather_rain_days_5mm": "NBJRR5",
+    "weather_rain_days_10mm": "NBJRR10",
+    "weather_fog_days": "NBJBROU",
 }
 
 WEATHER_COLUMNS = list(WEATHER_FIELD_MAP)
@@ -228,7 +225,10 @@ def load_monthly_weather(
                 continue
             weights = 1.0 / np.maximum(valid["distance_km"].to_numpy(dtype=float), 1.0) ** 2
             values = valid[source].to_numpy(dtype=float)
-            row[feature] = float(np.average(values, weights=weights))
+            value = float(np.average(values, weights=weights))
+            if feature == "weather_rain_mm":
+                value /= 10.0
+            row[feature] = value
         rows.append(row)
 
     monthly = pd.DataFrame(rows).sort_values("month").reset_index(drop=True)
@@ -239,7 +239,7 @@ def load_monthly_weather(
 def add_monthly_weather_features(
     daily: pd.DataFrame,
     monthly_weather: pd.DataFrame,
-    lag_months: int = 1,
+    lag_months: int = 0,
 ) -> pd.DataFrame:
     if lag_months < 0:
         raise ValueError("lag_months must be non-negative.")

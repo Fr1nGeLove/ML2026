@@ -135,14 +135,11 @@ def test_monthly_weather_is_distance_weighted(tmp_path) -> None:
             "LAT": [48.7786, 48.8786],
             "LON": [2.2906, 2.3906],
             "AAAAMM": ["201001", "201001"],
-            "RR": [10.0, 100.0],
-            "TX": [8.0, 18.0],
-            "TN": [2.0, 12.0],
-            "TM": [5.0, 15.0],
-            "TAMPLIM": [6.0, 6.0],
+            "RR": [100.0, 1000.0],
             "NBJRR1": [4.0, 14.0],
-            "NBJGELEE": [8.0, 0.0],
-            "NBJTX25": [0.0, 3.0],
+            "NBJRR5": [2.0, 12.0],
+            "NBJRR10": [1.0, 11.0],
+            "NBJBROU": [3.0, 13.0],
         }
     )
     frame.to_csv(weather_path, sep=";", index=False, compression="gzip")
@@ -151,26 +148,49 @@ def test_monthly_weather_is_distance_weighted(tmp_path) -> None:
 
     assert monthly.loc[0, "month"] == "201001"
     assert monthly.loc[0, "weather_rain_mm"] < 20.0
-    assert monthly.loc[0, "weather_tmax"] < 10.0
+    assert monthly.loc[0, "weather_rain_days_1mm"] < 5.0
+    assert monthly.loc[0, "weather_rain_days_5mm"] < 3.0
+    assert monthly.loc[0, "weather_rain_days_10mm"] < 2.0
+    assert monthly.loc[0, "weather_fog_days"] < 4.0
 
 
-def test_add_monthly_weather_uses_previous_month_by_default() -> None:
+def test_monthly_weather_scales_rainfall_tenths_to_mm(tmp_path) -> None:
+    weather_path = tmp_path / "weather.csv.gz"
+    frame = pd.DataFrame(
+        {
+            "NUM_POSTE": ["station"],
+            "NOM_USUEL": ["station"],
+            "LAT": [48.7786],
+            "LON": [2.2906],
+            "AAAAMM": ["201001"],
+            "RR": [123.0],
+            "NBJRR1": [4.0],
+            "NBJRR5": [2.0],
+            "NBJRR10": [1.0],
+            "NBJBROU": [3.0],
+        }
+    )
+    frame.to_csv(weather_path, sep=";", index=False, compression="gzip")
+
+    monthly = load_monthly_weather(weather_path)
+
+    assert monthly.loc[0, "weather_rain_mm"] == 12.3
+
+
+def test_add_monthly_weather_uses_same_month_by_default() -> None:
     daily = pd.DataFrame({"date": pd.date_range("2010-02-01", periods=2, freq="D"), TARGET_COLUMN: [1.0, 2.0]})
     monthly = pd.DataFrame(
         {
             "month": ["201001", "201002"],
             "weather_rain_mm": [10.0, 20.0],
-            "weather_tmax": [8.0, 9.0],
-            "weather_tmin": [2.0, 3.0],
-            "weather_tmean": [5.0, 6.0],
-            "weather_temp_amp": [6.0, 6.0],
-            "weather_rain_days": [4.0, 5.0],
-            "weather_frost_days": [8.0, 2.0],
-            "weather_hot_days": [0.0, 0.0],
+            "weather_rain_days_1mm": [4.0, 5.0],
+            "weather_rain_days_5mm": [2.0, 3.0],
+            "weather_rain_days_10mm": [1.0, 2.0],
+            "weather_fog_days": [3.0, 4.0],
         }
     )
 
-    enriched = add_monthly_weather_features(daily, monthly, lag_months=1)
+    enriched = add_monthly_weather_features(daily, monthly)
 
-    assert enriched["weather_rain_mm"].tolist() == [10.0, 10.0]
-    assert enriched["weather_tmean"].tolist() == [5.0, 5.0]
+    assert enriched["weather_rain_mm"].tolist() == [20.0, 20.0]
+    assert enriched["weather_fog_days"].tolist() == [4.0, 4.0]
