@@ -2,7 +2,7 @@
 
 本仓库用于对 UCI Individual Household Electric Power Consumption 数据集进行日级用电量预测。
 
-仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含课程报告、图表、模型训练产物或对话内容。
+仓库包含可运行代码、测试、环境配置和小型处理后 CSV 数据。
 
 ## 内容
 
@@ -59,11 +59,11 @@ conda activate ml_power
 
 [Météo-France monthly climatological data](https://www.data.gouv.fr/fr/datasets/donnees-climatologiques-de-base-mensuelles)
 
-课程提供的是月度气候数据，不需要逐日天气数据。预处理时会把同一个月的 `RR`、`NBJRR1`、`NBJRR5`、`NBJRR10`、`NBJBROU` 映射到该月每天；其中 `RR` 按课程提示除以 10。
+项目提供的是月度气候数据，不需要逐日天气数据。预处理时会把同一个月的 `RR`、`NBJRR1`、`NBJRR5`、`NBJRR10`、`NBJBROU` 映射到该月每天；其中 `RR` 除以 10。
 
 ## 当前发布版说明
 
-当前版本已按课程提示使用 5 个 Météo-France 月度气候字段：
+当前版本使用 5 个 Météo-France 月度气候字段：
 
 - `RR`：月降水量，预处理时除以 10 后作为 `weather_rain_mm`
 - `NBJRR1`：月内日降水量大于等于 1mm 的天数
@@ -71,7 +71,9 @@ conda activate ml_power
 - `NBJRR10`：月内日降水量大于等于 10mm 的天数
 - `NBJBROU`：月内有雾天数
 
-发布仓库中的 `data/daily_power.csv`、`data/train.csv`、`data/test.csv` 已由上述逻辑生成。读者也可以下载原始 UCI 数据和月度气候数据后，用下面的命令重新生成。
+发布仓库中的 `data/daily_power.csv`、`data/train.csv`、`data/test.csv` 已由上述逻辑生成。
+
+读者也可以下载原始 UCI 数据和月度气候数据后，用下面的命令重新生成。
 
 ## 常用命令
 
