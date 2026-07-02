@@ -2,7 +2,7 @@
 
 本仓库用于对 UCI Individual Household Electric Power Consumption 数据集进行日级用电量预测。
 
-仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含模型训练产物。
+仓库只保留可运行代码、测试、环境配置和小型处理后 CSV 数据，不包含课程报告、图表、模型训练产物或对话内容。
 
 ## 内容
 
@@ -61,6 +61,18 @@ conda activate ml_power
 
 课程提供的是月度气候数据，不需要逐日天气数据。预处理时会把同一个月的 `RR`、`NBJRR1`、`NBJRR5`、`NBJRR10`、`NBJBROU` 映射到该月每天；其中 `RR` 按课程提示除以 10。
 
+## 当前发布版说明
+
+当前版本已按课程提示使用 5 个 Météo-France 月度气候字段：
+
+- `RR`：月降水量，预处理时除以 10 后作为 `weather_rain_mm`
+- `NBJRR1`：月内日降水量大于等于 1mm 的天数
+- `NBJRR5`：月内日降水量大于等于 5mm 的天数
+- `NBJRR10`：月内日降水量大于等于 10mm 的天数
+- `NBJBROU`：月内有雾天数
+
+发布仓库中的 `data/daily_power.csv`、`data/train.csv`、`data/test.csv` 已由上述逻辑生成。读者也可以下载原始 UCI 数据和月度气候数据后，用下面的命令重新生成。
+
 ## 常用命令
 
 重新准备数据：
@@ -105,6 +117,14 @@ python scripts\make_plots.py
 
 ```powershell
 python -m pytest -q
+```
+
+发布前验证过的最小复现流程：
+
+```powershell
+python scripts\prepare_data.py
+python -m pytest -q
+python scripts\run_experiments.py --preset smoke --models last_value moving_average weekly_seasonal_naive lstm transformer patch_channel_mixer --horizons 90 --seeds 0
 ```
 
 ## 说明
